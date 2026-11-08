@@ -1,98 +1,1367 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="si">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f3f8ff">
-<title>MathsMate | Smart Maths Board</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<script defer src="https://unpkg.com/mathlive"></script>
-<script defer src="app.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f8fafc">
+
+  <title>MathsMate - Smart Mathematics Whiteboard</title>
+
+  <!-- MathLive Equation Editor -->
+  <script defer src="https://unpkg.com/mathlive"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "Noto Sans Sinhala", sans-serif;
+      background: #f3f6fb;
+      color: #172033;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      height: 68px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: white;
+      border-bottom: 1px solid #e5eaf1;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 180px;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: #176b5b;
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      font-size: 19px;
+      font-weight: 800;
+      color: #143e38;
+    }
+
+    .brand-subtitle {
+      font-size: 10px;
+      color: #82909d;
+      margin-top: 2px;
+    }
+
+    .board-title-wrap {
+      flex: 1;
+      max-width: 400px;
+    }
+
+    .board-title-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid transparent;
+      background: #f8fafc;
+      border-radius: 9px;
+      outline: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .board-title-input:focus {
+      border-color: #80b8aa;
+      background: white;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .save-status {
+      font-size: 11px;
+      color: #64748b;
+      margin-right: 5px;
+      white-space: nowrap;
+    }
+
+    .toolbar-btn {
+      padding: 9px 13px;
+      border: 1px solid #dce4ec;
+      border-radius: 8px;
+      background: white;
+      color: #263747;
+      font-size: 12px;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .toolbar-btn:hover {
+      background: #eff7f5;
+      border-color: #91bdb1;
+    }
+
+    .toolbar-btn.primary {
+      background: #176b5b;
+      color: white;
+      border-color: #176b5b;
+    }
+
+    .toolbar-btn.primary:hover {
+      background: #105548;
+    }
+
+    .main-layout {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      background: white;
+      border-right: 1px solid #e5eaf1;
+      height: calc(100vh - 68px);
+      position: sticky;
+      top: 68px;
+      overflow-y: auto;
+      padding: 18px;
+    }
+
+    .sidebar-heading {
+      font-size: 15px;
+      font-weight: 800;
+      margin: 0 0 5px;
+    }
+
+    .sidebar-description {
+      color: #8995a5;
+      font-size: 11px;
+      line-height: 1.6;
+      margin-bottom: 17px;
+    }
+
+    .tool-section {
+      margin-bottom: 21px;
+    }
+
+    .section-heading {
+      font-size: 12px;
+      font-weight: 700;
+      color: #526273;
+      margin-bottom: 10px;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .tool-card {
+      border: 1px solid #e3e9ef;
+      border-radius: 10px;
+      padding: 12px 8px;
+      background: #fff;
+      color: #334155;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      min-height: 65px;
+    }
+
+    .tool-card:hover {
+      border-color: #8bbbad;
+      background: #f3faf8;
+    }
+
+    .tool-icon {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 5px;
+    }
+
+    .category-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 9px;
+      margin-bottom: 10px;
+    }
+
+    .cat-tab {
+      flex-shrink: 0;
+      padding: 7px 10px;
+      border: 1px solid #e0e7ed;
+      border-radius: 20px;
+      background: white;
+      color: #657487;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .cat-tab.active {
+      background: #176b5b;
+      border-color: #176b5b;
+      color: white;
+    }
+
+    .symbol-search {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #dce4ec;
+      border-radius: 8px;
+      outline: none;
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    .symbol-search:focus {
+      border-color: #4b9b89;
+    }
+
+    .symbol-group {
+      margin-bottom: 17px;
+    }
+
+    .group-title {
+      font-size: 11px;
+      color: #6b7888;
+      margin: 0 0 9px;
+      font-weight: 700;
+    }
+
+    .symbol-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .symbol-btn {
+      border: 1px solid #e6ebf0;
+      background: #fff;
+      border-radius: 8px;
+      min-height: 59px;
+      padding: 5px 3px;
+      color: #263747;
+    }
+
+    .symbol-btn:hover {
+      background: #eff8f5;
+      border-color: #7db6a7;
+    }
+
+    .symbol {
+      display: block;
+      font-size: 19px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .symbol-btn small {
+      display: block;
+      color: #8793a1;
+      font-size: 8px;
+    }
+
+    .drawing-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .square-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid #dfe6ed;
+      background: white;
+      border-radius: 8px;
+      color: #475569;
+      font-size: 15px;
+    }
+
+    .square-btn:hover {
+      background: #eff8f5;
+      border-color: #7db6a7;
+    }
+
+    .square-btn.selected {
+      color: white;
+      background: #176b5b;
+      border-color: #176b5b;
+    }
+
+    .square-btn.danger {
+      color: #dc4545;
+    }
+
+    .brush-control {
+      margin-top: 12px;
+    }
+
+    .brush-control label {
+      display: flex;
+      justify-content: space-between;
+      color: #64748b;
+      font-size: 11px;
+      margin-bottom: 6px;
+    }
+
+    .brush-control input {
+      width: 100%;
+    }
+
+    .brush-color {
+      width: 100%;
+      height: 34px;
+      border: 1px solid #dfe6ed;
+      background: white;
+      border-radius: 7px;
+      margin-top: 9px;
+      padding: 3px;
+    }
+
+    .workspace {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 68px);
+    }
+
+    .workspace-toolbar {
+      min-height: 58px;
+      background: white;
+      border-bottom: 1px solid #e5eaf1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 18px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-label {
+      color: #82909d;
+      font-size: 10px;
+      margin-right: 3px;
+    }
+
+    .zoom-label {
+      min-width: 45px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .size-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+      color: #64748b;
+    }
+
+    .size-control input {
+      width: 85px;
+    }
+
+    .paper-container {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding: 25px;
+      background: #e9eef4;
+    }
+
+    .paper {
+      position: relative;
+      width: 6000px;
+      height: 4200px;
+      background-color: white;
+      overflow: hidden;
+      box-shadow: 0 3px 18px rgba(20, 40, 60, .09);
+      transform-origin: top left;
+    }
+
+    .paper.grid {
+      background-image:
+        linear-gradient(#e8edf3 1px, transparent 1px),
+        linear-gradient(90deg, #e8edf3 1px, transparent 1px);
+      background-size: 25px 25px;
+    }
+
+    .paper.dots {
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 22px 22px;
+    }
+
+    .paper.plain {
+      background-image: none;
+    }
+
+    .paper.lines {
+      background-image: repeating-linear-gradient(
+        transparent,
+        transparent 31px,
+        #dbe5ef 32px
+      );
+    }
+
+    .paper-placeholder {
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      text-align: center;
+      color: #94a3b8;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .paper-placeholder.hidden {
+      display: none;
+    }
+
+    .placeholder-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      color: #8cb6aa;
+    }
+
+    .paper-placeholder h2 {
+      font-size: 19px;
+      color: #64748b;
+      margin: 0 0 8px;
+    }
+
+    .paper-placeholder p {
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    #equationLayer {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    #inkCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 3;
+      pointer-events: none;
+      touch-action: none;
+    }
+
+    .board-object {
+      position: absolute;
+      min-width: 100px;
+      min-height: 42px;
+      padding: 17px 12px 10px;
+      border: 1px solid transparent;
+      border-radius: 5px;
+      background: transparent;
+      pointer-events: auto;
+      resize: both;
+      overflow: auto;
+      z-index: 4;
+    }
+
+    .board-object.selected {
+      border: 1px dashed #3d9b85;
+      background: rgba(255,255,255,.65);
+    }
+
+    .object-drag-handle {
+      position: absolute;
+      top: 0;
+      left: 2px;
+      width: 27px;
+      height: 19px;
+      display: grid;
+      place-items: center;
+      color: #8b9aab;
+      font-size: 15px;
+      cursor: grab;
+      user-select: none;
+      opacity: 0;
+      z-index: 8;
+    }
+
+    .board-object:hover .object-drag-handle,
+    .board-object.selected .object-drag-handle {
+      opacity: 1;
+    }
+
+    .object-drag-handle:active {
+      cursor: grabbing;
+    }
+
+    .equation-field {
+      display: block;
+      width: 100%;
+      min-height: 40px;
+      padding: 3px;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: #172033;
+      --selection-background-color: #d8f0e9;
+      --caret-color: #176b5b;
+    }
+
+    .note-edit {
+      display: block;
+      width: 100%;
+      min-height: 60px;
+      border: none;
+      outline: none;
+      resize: none;
+      overflow: hidden;
+      padding: 5px;
+      background: transparent;
+      color: #334155;
+      line-height: 1.7;
+    }
+
+    .object-actions {
+      position: absolute;
+      top: -12px;
+      right: -10px;
+      opacity: 0;
+      z-index: 9;
+    }
+
+    .board-object:hover .object-actions,
+    .board-object.selected .object-actions {
+      opacity: 1;
+    }
+
+    .delete-object {
+      border: none;
+      border-radius: 50%;
+      width: 23px;
+      height: 23px;
+      color: white;
+      background: #e05252;
+      font-size: 17px;
+      line-height: 20px;
+    }
+
+    .shape-svg {
+      width: 100%;
+      height: 100%;
+      min-width: 100px;
+      min-height: 80px;
+      overflow: visible;
+    }
+
+    .shape-svg polygon,
+    .shape-svg rect,
+    .shape-svg circle,
+    .shape-svg path:not([fill="none"]) {
+      fill: rgba(23,107,91,.08);
+      stroke: #176b5b;
+      stroke-width: 2.5;
+    }
+
+    .shape-svg line,
+    .shape-svg path {
+      stroke: #176b5b;
+      stroke-width: 2.5;
+      fill: none;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      padding: 12px 18px;
+      background: #172d35;
+      color: white;
+      font-size: 12px;
+      border-radius: 9px;
+      opacity: 0;
+      pointer-events: none;
+      transition: .2s;
+      z-index: 200;
+      box-shadow: 0 5px 20px rgba(0,0,0,.15);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    dialog {
+      width: min(520px, calc(100% - 30px));
+      max-height: 80vh;
+      border: 1px solid #e2e8f0;
+      border-radius: 15px;
+      padding: 22px;
+      box-shadow: 0 20px 70px rgba(0,0,0,.2);
+    }
+
+    dialog::backdrop {
+      background: rgba(15,23,42,.45);
+      backdrop-filter: blur(3px);
+    }
+
+    .dialog-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    .dialog-heading h2 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .dialog-close {
+      border: none;
+      background: #f1f5f9;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      font-size: 19px;
+    }
+
+    .shape-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+    }
+
+    .shape-option {
+      min-height: 75px;
+      border: 1px solid #e2e8f0;
+      border-radius: 9px;
+      background: white;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .shape-option:hover {
+      border-color: #176b5b;
+      background: #eff8f5;
+    }
+
+    .shape-option span {
+      display: block;
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
+
+    .saved-board-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #e7edf2;
+      padding: 11px;
+      border-radius: 9px;
+      margin-bottom: 8px;
+    }
+
+    .saved-board-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .saved-board-info b {
+      font-size: 12px;
+    }
+
+    .saved-board-info small {
+      color: #8793a1;
+      font-size: 10px;
+    }
+
+    .help-content {
+      font-size: 12px;
+      color: #526273;
+      line-height: 1.9;
+    }
+
+    .help-content h3 {
+      color: #176b5b;
+      font-size: 13px;
+    }
+
+    /* Print / PDF export */
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 8mm;
+      }
+
+      body {
+        background: white !important;
+      }
+
+      .topbar,
+      .sidebar,
+      .workspace-toolbar,
+      .toast,
+      .object-drag-handle,
+      .object-actions,
+      .paper-placeholder {
+        display: none !important;
+      }
+
+      .main-layout,
+      .workspace,
+      .paper-container {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        background: white !important;
+      }
+
+      .paper {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 180mm;
+        overflow: visible !important;
+        box-shadow: none !important;
+        transform: none !important;
+        zoom: 1 !important;
+        background-color: white !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      #equationLayer {
+        position: relative !important;
+        min-height: 180mm;
+      }
+
+      .board-object {
+        resize: none !important;
+        overflow: visible !important;
+        border: none !important;
+        background: transparent !important;
+      }
+
+      #inkCanvas {
+        position: absolute !important;
+      }
+    }
+
+    @media(max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 260px minmax(0, 1fr);
+      }
+
+      .sidebar {
+        padding: 13px;
+      }
+
+      .topbar {
+        padding: 0 12px;
+      }
+
+      .brand {
+        min-width: auto;
+      }
+
+      .brand-subtitle {
+        display: none;
+      }
+
+      .save-status {
+        display: none;
+      }
+    }
+
+    @media(max-width: 650px) {
+      .topbar {
+        height: auto;
+        min-height: 65px;
+        flex-wrap: wrap;
+        padding: 10px;
+      }
+
+      .board-title-wrap {
+        order: 3;
+        max-width: none;
+        flex-basis: 100%;
+      }
+
+      .top-actions {
+        margin-left: auto;
+      }
+
+      .top-actions .toolbar-btn {
+        padding: 8px;
+        font-size: 10px;
+      }
+
+      .main-layout {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar {
+        position: relative;
+        top: auto;
+        width: 100%;
+        height: auto;
+        max-height: 350px;
+        border-right: none;
+        border-bottom: 1px solid #e5eaf1;
+      }
+
+      .workspace {
+        height: 70vh;
+      }
+
+      .paper-container {
+        padding: 12px;
+      }
+
+      .workspace-toolbar {
+        padding: 8px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<header class="topbar">
-  <a class="brand" href="#"><span class="brand-mark">∑</span><span><b>MathsMate</b><small>SMART MATHS BOARD</small></span></a>
-  <div class="top-center"><span class="online-dot"></span> ගණිතය ලියන්න · වෙනස් කරන්න · විසඳන්න</div>
-  <div class="top-actions">
-    <button class="top-btn" id="helpBtn" title="උපදෙස්">? <span>උදව්</span></button>
-    <button class="top-btn" id="downloadBtn" title="PNG ලෙස බාගන්න">↓ <span>Download</span></button>
-    <button class="save-btn" id="saveBtn">සුරකින්න</button>
-  </div>
-</header>
 
-<div class="layout">
-  <aside class="formula-panel">
-    <div class="panel-heading"><div><span class="eyebrow">MATH TOOLKIT</span><h2>ගණිත සංකේත</h2><p>අවශ්‍ය සංකේතය click කරන්න</p></div><span class="sparkle">✦</span></div>
-    <div class="search-box"><span>⌕</span><input id="symbolSearch" type="search" placeholder="සංකේතයක් සොයන්න..."></div>
-    <div class="category-tabs" id="categoryTabs">
-      <button class="cat-tab active" data-category="all">සියල්ල</button>
-      <button class="cat-tab" data-category="basic">මූලික</button>
-      <button class="cat-tab" data-category="algebra">වීජ ගණිතය</button>
-      <button class="cat-tab" data-category="fractions">භාග හා මූල</button>
-      <button class="cat-tab" data-category="geometry">ජ්‍යාමිතිය</button>
-      <button class="cat-tab" data-category="functions">Functions</button>
-      <button class="cat-tab" data-category="mensuration">මිනුම්</button>
-    </div>
-    <div class="symbol-groups" id="symbolGroups"></div>
-    <div class="panel-foot"><span class="keyboard-icon">⌨</span><span><b>Keyboard එකෙන්ම ලියන්න</b><small>සූත්‍රය තෝරලා පුවරුවේ edit කරන්න. සංකේත buttons shortcut එකක් විතරයි.</small></span></div>
-  </aside>
+<div class="app-shell">
 
-  <main class="board-area">
-    <div class="board-heading">
-      <div><span class="eyebrow">YOUR WORKSPACE</span><h1>ඔබේ ගණිත පුවරුව</h1><p>පුවරුව මත click කරලා සෘජුවම ගණිතය type කරන්න.</p></div>
-      <label class="doc-name"><span class="doc-status"></span><input id="boardTitle" value="මගේ ගණිත වැඩපොත" aria-label="පුවරුවේ නම"></label>
-    </div>
-    <div class="editor-toolbar">
-      <div class="toolbar-left">
-        <button class="toolbar-btn selected" id="selectMode" title="තෝරන්න">↖ <span>තෝරන්න</span></button>
-        <button class="toolbar-btn" id="addEquation" title="නව equation එකක්">ƒx <span>Equation</span></button>
-        <button class="toolbar-btn" id="addNote" title="පෙළ සටහනක්">T <span>සටහනක්</span></button>
-        <button class="toolbar-btn" id="addShape" title="Shape එකක්">△ <span>Shape</span></button>
-      </div>
-      <div class="toolbar-right">
-        <button class="square-btn" id="undoBtn" title="Undo Ctrl+Z">↶</button>
-        <button class="square-btn" id="redoBtn" title="Redo Ctrl+Y">↷</button>
-        <button class="square-btn danger" id="clearBtn" title="පුවරුව හිස් කරන්න">⌫</button>
+  <!-- TOP HEADER -->
+  <header class="topbar">
+
+    <div class="brand">
+      <div class="brand-logo">M</div>
+
+      <div>
+        <div class="brand-name">MathsMate</div>
+        <div class="brand-subtitle">Smart Mathematics Whiteboard</div>
       </div>
     </div>
-    <div class="board-options">
-      <span class="option-label">පුවරුව</span>
-      <select id="paperStyle" aria-label="පසුබිම් රටාව"><option value="grid">Grid</option><option value="dots">Dots</option><option value="plain">හිස්</option><option value="lines">Lines</option></select>
-      <span class="divider"></span>
-      <button class="text-option" id="zoomOut">−</button><span id="zoomLabel">100%</span><button class="text-option" id="zoomIn">＋</button>
-      <span class="spacer"></span><span class="board-tip">Equation එකක් click කළාම ඒක edit කරන්න පුළුවන්</span>
+
+    <div class="board-title-wrap">
+      <input
+        type="text"
+        id="boardTitle"
+        class="board-title-input"
+        value="මගේ ගණිත වැඩපොත"
+        placeholder="පුවරුවේ නම"
+      >
     </div>
-    <section class="paper-wrap" id="paperWrap">
-      <div class="paper" id="paper">
-        <div class="paper-placeholder" id="placeholder"><div class="placeholder-icon">ƒx</div><b>ඔබේ ගණිත විසඳුම මෙතැනින් අරඹන්න</b><span>“+ Equation” click කරන්න, නැතිනම් සංකේත panel එකෙන් සූත්‍රයක් තෝරන්න.</span><button id="firstEquation">පළමු සමීකරණය ලියන්න <span>→</span></button></div>
-        <div id="equationLayer" class="equation-layer"></div>
+
+    <div class="top-actions">
+
+      <span id="saveStatus" class="save-status">
+        සුරැකී නැත
+      </span>
+
+      <button id="newBoardBtn" class="toolbar-btn">
+        + New
+      </button>
+
+      <button id="openBoardBtn" class="toolbar-btn">
+        Open
+      </button>
+
+      <button id="saveBtn" class="toolbar-btn primary">
+        Save
+      </button>
+
+      <button id="downloadBtn" class="toolbar-btn">
+        PDF
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- MAIN LAYOUT -->
+  <main class="main-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <h2 class="sidebar-heading">Mathematics Tools</h2>
+
+      <p class="sidebar-description">
+        ගණිත සූත්‍ර, සංකේත, හැඩතල සහ සටහන් ඔබගේ whiteboard එකට එක් කරන්න.
+      </p>
+
+
+      <!-- BASIC TOOLS -->
+      <section class="tool-section">
+
+        <div class="section-heading">Whiteboard Tools</div>
+
+        <div class="tool-grid">
+
+          <button class="tool-card" id="addEquation">
+            <span class="tool-icon">∑</span>
+            Equation
+          </button>
+
+          <button class="tool-card" id="addNote">
+            <span class="tool-icon">T</span>
+            Text Note
+          </button>
+
+          <button class="tool-card" id="addShape">
+            <span class="tool-icon">△</span>
+            Shapes
+          </button>
+
+          <button class="tool-card" id="helpBtn">
+            <span class="tool-icon">?</span>
+            Help
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- DRAWING TOOLS -->
+      <section class="tool-section">
+
+        <div class="section-heading">Drawing Tools</div>
+
+        <div class="drawing-tools">
+
+          <button
+            class="square-btn selected"
+            id="selectMode"
+            title="Select and move"
+          >↖</button>
+
+          <button
+            class="square-btn"
+            id="penMode"
+            title="Pen"
+          >✎</button>
+
+          <button
+            class="square-btn"
+            id="eraserMode"
+            title="Eraser"
+          >⌫</button>
+
+          <button
+            class="square-btn"
+            id="clearInkBtn"
+            title="Clear drawing"
+          >⌧</button>
+
+        </div>
+
+        <div class="brush-control">
+
+          <label>
+            <span>Brush thickness</span>
+            <span id="brushSizeValue">4px</span>
+          </label>
+
+          <input
+            type="range"
+            id="brushSize"
+            min="1"
+            max="20"
+            value="4"
+          >
+
+          <input
+            type="color"
+            id="penColor"
+            class="brush-color"
+            value="#176b5b"
+            title="Pen colour"
+          >
+
+        </div>
+
+      </section>
+
+
+      <!-- SYMBOL LIBRARY -->
+      <section class="tool-section">
+
+        <div class="section-heading">Mathematical Symbols</div>
+
+        <div class="category-tabs" id="categoryTabs">
+
+          <button class="cat-tab active" data-category="all">
+            All
+          </button>
+
+          <button class="cat-tab" data-category="basic">
+            Basic
+          </button>
+
+          <button class="cat-tab" data-category="algebra">
+            Algebra
+          </button>
+
+          <button class="cat-tab" data-category="fractions">
+            Fractions
+          </button>
+
+          <button class="cat-tab" data-category="geometry">
+            Geometry
+          </button>
+
+          <button class="cat-tab" data-category="functions">
+            Functions
+          </button>
+
+          <button class="cat-tab" data-category="mensuration">
+            Mensuration
+          </button>
+
+        </div>
+
+        <input
+          type="search"
+          id="symbolSearch"
+          class="symbol-search"
+          placeholder="Search symbols..."
+        >
+
+        <div id="symbolGroups"></div>
+
+      </section>
+
+    </aside>
+
+
+    <!-- WHITEBOARD WORKSPACE -->
+    <section class="workspace">
+
+      <!-- WORKSPACE TOOLBAR -->
+      <div class="workspace-toolbar">
+
+        <div class="toolbar-group">
+
+          <button id="undoBtn" class="square-btn" title="Undo">
+            ↶
+          </button>
+
+          <button id="redoBtn" class="square-btn" title="Redo">
+            ↷
+          </button>
+
+          <span class="toolbar-label">Paper:</span>
+
+          <select id="paperStyle" class="toolbar-btn">
+            <option value="grid">Grid</option>
+            <option value="dots">Dots</option>
+            <option value="lines">Lines</option>
+            <option value="plain">Plain</option>
+          </select>
+
+        </div>
+
+
+        <div class="toolbar-group">
+
+          <div class="size-control">
+            <span>Font size</span>
+
+            <input
+              type="range"
+              id="objectFontSize"
+              min="12"
+              max="80"
+              value="34"
+            >
+
+            <span id="objectSizeValue">34px</span>
+          </div>
+
+          <button id="zoomOut" class="square-btn">
+            −
+          </button>
+
+          <span id="zoomLabel" class="zoom-label">
+            100%
+          </span>
+
+          <button id="zoomIn" class="square-btn">
+            +
+          </button>
+
+        </div>
+
       </div>
+
+
+      <!-- PAPER -->
+      <div class="paper-container" id="paperContainer">
+
+        <div class="paper grid" id="paper">
+
+          <div class="paper-placeholder" id="placeholder">
+
+            <div class="placeholder-icon">∑</div>
+
+            <h2>MathsMate Whiteboard</h2>
+
+            <p>
+              පුවරුවේ ඕනෑම හිස් ස්ථානයක් click කර
+              ගණිත සූත්‍රයක් type කරන්න.
+              <br><br>
+              නැතහොත් Equation බොත්තම භාවිතා කරන්න.
+            </p>
+
+          </div>
+
+          <div id="equationLayer"></div>
+
+          <canvas id="inkCanvas"></canvas>
+
+        </div>
+
+      </div>
+
     </section>
-    <footer class="board-footer"><span><kbd>Ctrl</kbd> + <kbd>Z</kbd> Undo <span class="footer-sep">·</span> <kbd>Ctrl</kbd> + <kbd>Y</kbd> Redo <span class="footer-sep">·</span> <kbd>Delete</kbd> Remove selected</span><span id="saveStatus">ස්වයංක්‍රීයව සුරැකේ</span></footer>
+
   </main>
+
 </div>
 
-<dialog id="shapeDialog" class="dialog">
- <div class="dialog-head"><div><span class="eyebrow">GEOMETRY</span><h2>හැඩතලයක් එක් කරන්න</h2></div><button class="close-btn" id="closeShape">×</button></div>
- <div class="shape-choices">
-  <button data-shape="triangle"><span>△</span>ත්‍රිකෝණය</button><button data-shape="square"><span>□</span>චතුරස්‍රය</button><button data-shape="circle"><span>○</span>වෘත්තය</button><button data-shape="line"><span>／</span>රේඛාව</button>
- </div>
- <p class="dialog-hint">හැඩතලය පුවරුවට එක් වූ පසු එහි ප්‍රමාණය සහ ස්ථානය වෙනස් කළ හැකියි.</p>
+
+<!-- TOAST MESSAGE -->
+<div id="toast" class="toast"></div>
+
+
+<!-- SHAPES DIALOG -->
+<dialog id="shapeDialog">
+
+  <div class="dialog-heading">
+
+    <h2>Shape Library</h2>
+
+    <button
+      id="closeShape"
+      class="dialog-close"
+      aria-label="Close"
+    >×</button>
+
+  </div>
+
+  <p class="sidebar-description">
+    ඔබට අවශ්‍ය හැඩය තෝරා whiteboard එකට එක් කරන්න.
+  </p>
+
+  <div class="shape-options">
+
+    <button class="shape-option" data-shape="triangle">
+      <span>△</span>
+      Triangle
+    </button>
+
+    <button class="shape-option" data-shape="square">
+      <span>□</span>
+      Square
+    </button>
+
+    <button class="shape-option" data-shape="circle">
+      <span>○</span>
+      Circle
+    </button>
+
+    <button class="shape-option" data-shape="line">
+      <span>／</span>
+      Line
+    </button>
+
+    <button class="shape-option" data-shape="sector">
+      <span>◔</span>
+      Sector
+    </button>
+
+    <button class="shape-option" data-shape="semicircle">
+      <span>◠</span>
+      Semicircle
+    </button>
+
+    <button class="shape-option" data-shape="arc">
+      <span>⌒</span>
+      Arc
+    </button>
+
+    <button class="shape-option" data-shape="rectangle">
+      <span>▭</span>
+      Rectangle
+    </button>
+
+  </div>
+
 </dialog>
 
-<dialog id="helpDialog" class="dialog">
- <div class="dialog-head"><div><span class="eyebrow">QUICK GUIDE</span><h2>භාවිතා කරන ආකාරය</h2></div><button class="close-btn" id="closeHelp">×</button></div>
- <div class="guide">
-  <p><b>Equation ලියන්න:</b> “+ Equation” හෝ වම් පැත්තේ සංකේතයක් click කරන්න. Equation එක පුවරුවට එක් වූ පසු එය මත click කර කෙළින්ම edit කරන්න.</p>
-  <p><b>Keyboard:</b> ලියන විට laptop keyboard එක භාවිතා කරන්න. MathLive editor එක fractions, roots, powers, trig සහ අනෙකුත් සංකේත හඳුනාගනී.</p>
-  <p><b>සටහන්:</b> “සටහනක්” click කර සාමාන්‍ය විස්තර type කරන්න.</p>
-  <p><b>Move:</b> Equation එකේ පිටත border එක drag කර වෙනත් තැනකට ගෙන යන්න. Formula එක ඇතුළේ click කළොත් edit mode එකට යයි.</p>
-  <p><b>Save:</b> සටහන් මේ browser එකේ save වේ. PNG download කිරීමෙන් image එකක් ලබාගන්න පුළුවන්.</p>
- </div>
- <p class="notice">MathLive සූත්‍ර editor එක load වීමට internet connection එකක් අවශ්‍යයි. Saved data එක මේ browser/device එකට සීමා වේ.</p>
+
+<!-- SAVED BOARDS DIALOG -->
+<dialog id="boardsDialog">
+
+  <div class="dialog-heading">
+
+    <h2>My Saved Boards</h2>
+
+    <button
+      id="closeBoards"
+      class="dialog-close"
+      aria-label="Close"
+    >×</button>
+
+  </div>
+
+  <p class="sidebar-description">
+    ඔබ සුරැකි ගණිත පුවරු මෙතැනින් නැවත විවෘත කරන්න.
+  </p>
+
+  <div id="savedBoardsList"></div>
+
 </dialog>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+
+<!-- HELP DIALOG -->
+<dialog id="helpDialog">
+
+  <div class="dialog-heading">
+
+    <h2>How to Use MathsMate</h2>
+
+    <button
+      id="closeHelp"
+      class="dialog-close"
+      aria-label="Close"
+    >×</button>
+
+  </div>
+
+  <div class="help-content">
+
+    <h3>1. Add Equations</h3>
+
+    <p>
+      Equation button එක click කර ගණිත සූත්‍ර type කරන්න.
+      Whiteboard එකේ හිස් තැනක් click කරත් equation එකක්
+      එකතු කරන්න පුළුවන්.
+    </p>
+
+    <h3>2. Mathematical Symbols</h3>
+
+    <p>
+      Symbol library එකෙන් අවශ්‍ය සංකේතය තෝරන්න.
+      එය තෝරාගත් equation එකට එකතු වේ.
+    </p>
+
+    <h3>3. Add Notes</h3>
+
+    <p>
+      Text Note භාවිතයෙන් ගණිත ගැටලුවක පියවර,
+      පැහැදිලි කිරීම් සහ පිළිතුරු ලියන්න.
+    </p>
+
+    <h3>4. Move and Resize</h3>
+
+    <p>
+      Object එකේ ඉහළ ඇති drag handle එකෙන්
+      අවශ්‍ය තැනට ගෙන යන්න.
+      පහළ දකුණු කෙළවරෙන් ප්‍රමාණය වෙනස් කරන්න.
+    </p>
+
+    <h3>5. Drawing Tools</h3>
+
+    <p>
+      Pen තෝරා mouse, touchpad හෝ stylus එකෙන් අඳින්න.
+      Eraser මඟින් ඇඳි රේඛා මකා දමන්න.
+    </p>
+
+    <h3>6. Save Your Work</h3>
+
+    <p>
+      Save button එකෙන් පුවරුව නමක් සමඟ සුරකින්න.
+      Open button එකෙන් කලින් සුරැකි පුවරු නැවත ලබාගන්න.
+    </p>
+
+    <h3>7. Export as PDF</h3>
+
+    <p>
+      PDF button එක click කර browser print window එක විවෘත කරන්න.
+      Destination ලෙස Save as PDF තෝරන්න.
+    </p>
+
+    <p>
+      <strong>Note:</strong>
+      සුරැකි පුවරු මෙම browser එකේ සහ device එකේ local storage
+      තුළ තබා ගනී. වෙනත් device එකක ඒවා ස්වයංක්‍රීයව
+      ලබාගත නොහැක.
+    </p>
+
+  </div>
+
+</dialog>
+
+
+<!-- APPLICATION JAVASCRIPT -->
+<script src="app.js"></script>
+
 </body>
 </html>
