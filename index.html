@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="si">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f3f8ff">
+<title>MathsMate | Smart Maths Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script defer src="https://unpkg.com/mathlive"></script>
+<script defer src="app.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#"><span class="brand-mark">∑</span><span><b>MathsMate</b><small>SMART MATHS BOARD</small></span></a>
+  <div class="top-center"><span class="online-dot"></span> ගණිතය ලියන්න · වෙනස් කරන්න · විසඳන්න</div>
+  <div class="top-actions">
+    <button class="top-btn" id="helpBtn" title="උපදෙස්">? <span>උදව්</span></button>
+    <button class="top-btn" id="downloadBtn" title="PNG ලෙස බාගන්න">↓ <span>Download</span></button>
+    <button class="save-btn" id="saveBtn">සුරකින්න</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="formula-panel">
+    <div class="panel-heading"><div><span class="eyebrow">MATH TOOLKIT</span><h2>ගණිත සංකේත</h2><p>අවශ්‍ය සංකේතය click කරන්න</p></div><span class="sparkle">✦</span></div>
+    <div class="search-box"><span>⌕</span><input id="symbolSearch" type="search" placeholder="සංකේතයක් සොයන්න..."></div>
+    <div class="category-tabs" id="categoryTabs">
+      <button class="cat-tab active" data-category="all">සියල්ල</button>
+      <button class="cat-tab" data-category="basic">මූලික</button>
+      <button class="cat-tab" data-category="algebra">වීජ ගණිතය</button>
+      <button class="cat-tab" data-category="fractions">භාග හා මූල</button>
+      <button class="cat-tab" data-category="geometry">ජ්‍යාමිතිය</button>
+      <button class="cat-tab" data-category="functions">Functions</button>
+      <button class="cat-tab" data-category="mensuration">මිනුම්</button>
+    </div>
+    <div class="symbol-groups" id="symbolGroups"></div>
+    <div class="panel-foot"><span class="keyboard-icon">⌨</span><span><b>Keyboard එකෙන්ම ලියන්න</b><small>සූත්‍රය තෝරලා පුවරුවේ edit කරන්න. සංකේත buttons shortcut එකක් විතරයි.</small></span></div>
+  </aside>
+
+  <main class="board-area">
+    <div class="board-heading">
+      <div><span class="eyebrow">YOUR WORKSPACE</span><h1>ඔබේ ගණිත පුවරුව</h1><p>පුවරුව මත click කරලා සෘජුවම ගණිතය type කරන්න.</p></div>
+      <label class="doc-name"><span class="doc-status"></span><input id="boardTitle" value="මගේ ගණිත වැඩපොත" aria-label="පුවරුවේ නම"></label>
+    </div>
+    <div class="editor-toolbar">
+      <div class="toolbar-left">
+        <button class="toolbar-btn selected" id="selectMode" title="තෝරන්න">↖ <span>තෝරන්න</span></button>
+        <button class="toolbar-btn" id="addEquation" title="නව equation එකක්">ƒx <span>Equation</span></button>
+        <button class="toolbar-btn" id="addNote" title="පෙළ සටහනක්">T <span>සටහනක්</span></button>
+        <button class="toolbar-btn" id="addShape" title="Shape එකක්">△ <span>Shape</span></button>
+      </div>
+      <div class="toolbar-right">
+        <button class="square-btn" id="undoBtn" title="Undo Ctrl+Z">↶</button>
+        <button class="square-btn" id="redoBtn" title="Redo Ctrl+Y">↷</button>
+        <button class="square-btn danger" id="clearBtn" title="පුවරුව හිස් කරන්න">⌫</button>
+      </div>
+    </div>
+    <div class="board-options">
+      <span class="option-label">පුවරුව</span>
+      <select id="paperStyle" aria-label="පසුබිම් රටාව"><option value="grid">Grid</option><option value="dots">Dots</option><option value="plain">හිස්</option><option value="lines">Lines</option></select>
+      <span class="divider"></span>
+      <button class="text-option" id="zoomOut">−</button><span id="zoomLabel">100%</span><button class="text-option" id="zoomIn">＋</button>
+      <span class="spacer"></span><span class="board-tip">Equation එකක් click කළාම ඒක edit කරන්න පුළුවන්</span>
+    </div>
+    <section class="paper-wrap" id="paperWrap">
+      <div class="paper" id="paper">
+        <div class="paper-placeholder" id="placeholder"><div class="placeholder-icon">ƒx</div><b>ඔබේ ගණිත විසඳුම මෙතැනින් අරඹන්න</b><span>“+ Equation” click කරන්න, නැතිනම් සංකේත panel එකෙන් සූත්‍රයක් තෝරන්න.</span><button id="firstEquation">පළමු සමීකරණය ලියන්න <span>→</span></button></div>
+        <div id="equationLayer" class="equation-layer"></div>
+      </div>
+    </section>
+    <footer class="board-footer"><span><kbd>Ctrl</kbd> + <kbd>Z</kbd> Undo <span class="footer-sep">·</span> <kbd>Ctrl</kbd> + <kbd>Y</kbd> Redo <span class="footer-sep">·</span> <kbd>Delete</kbd> Remove selected</span><span id="saveStatus">ස්වයංක්‍රීයව සුරැකේ</span></footer>
+  </main>
+</div>
+
+<dialog id="shapeDialog" class="dialog">
+ <div class="dialog-head"><div><span class="eyebrow">GEOMETRY</span><h2>හැඩතලයක් එක් කරන්න</h2></div><button class="close-btn" id="closeShape">×</button></div>
+ <div class="shape-choices">
+  <button data-shape="triangle"><span>△</span>ත්‍රිකෝණය</button><button data-shape="square"><span>□</span>චතුරස්‍රය</button><button data-shape="circle"><span>○</span>වෘත්තය</button><button data-shape="line"><span>／</span>රේඛාව</button>
+ </div>
+ <p class="dialog-hint">හැඩතලය පුවරුවට එක් වූ පසු එහි ප්‍රමාණය සහ ස්ථානය වෙනස් කළ හැකියි.</p>
+</dialog>
+
+<dialog id="helpDialog" class="dialog">
+ <div class="dialog-head"><div><span class="eyebrow">QUICK GUIDE</span><h2>භාවිතා කරන ආකාරය</h2></div><button class="close-btn" id="closeHelp">×</button></div>
+ <div class="guide">
+  <p><b>Equation ලියන්න:</b> “+ Equation” හෝ වම් පැත්තේ සංකේතයක් click කරන්න. Equation එක පුවරුවට එක් වූ පසු එය මත click කර කෙළින්ම edit කරන්න.</p>
+  <p><b>Keyboard:</b> ලියන විට laptop keyboard එක භාවිතා කරන්න. MathLive editor එක fractions, roots, powers, trig සහ අනෙකුත් සංකේත හඳුනාගනී.</p>
+  <p><b>සටහන්:</b> “සටහනක්” click කර සාමාන්‍ය විස්තර type කරන්න.</p>
+  <p><b>Move:</b> Equation එකේ පිටත border එක drag කර වෙනත් තැනකට ගෙන යන්න. Formula එක ඇතුළේ click කළොත් edit mode එකට යයි.</p>
+  <p><b>Save:</b> සටහන් මේ browser එකේ save වේ. PNG download කිරීමෙන් image එකක් ලබාගන්න පුළුවන්.</p>
+ </div>
+ <p class="notice">MathLive සූත්‍ර editor එක load වීමට internet connection එකක් අවශ්‍යයි. Saved data එක මේ browser/device එකට සීමා වේ.</p>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
