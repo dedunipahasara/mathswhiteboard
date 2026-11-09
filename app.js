@@ -198,13 +198,13 @@ function syncFontControls() {
   $("#fontFamily").value = object.fontFamily || "Inter, sans-serif";
 }
 
-function autoGrow(textarea, object) {
+function autoGrow(editor, object) {
   if (object.manualHeight) return;
-  textarea.style.height = "auto";
-  const needed = Math.max(90, textarea.scrollHeight + 4);
-  textarea.style.height = `${needed}px`;
+  editor.style.height = "auto";
+  const needed = Math.max(90, editor.scrollHeight + 8);
+  editor.style.height = `${needed}px`;
   object.h = Math.max(125, needed + 42);
-  const element = textarea.closest(".board-object");
+  const element = editor.closest(".board-object");
   if (element) element.style.height = `${object.h}px`;
 }
 
@@ -264,45 +264,51 @@ function renderObjects(focusId = null, focusEditor = false) {
       });
       element.append(field);
     } else if (object.kind === "note") {
-      const textarea = document.createElement("textarea");
-      textarea.className = "note-edit";
-      textarea.value = object.text || "";
-      textarea.placeholder = "Write your explanation, working steps or answer…";
-      textarea.style.fontSize = `${object.fontSize || 19}px`;
-      textarea.style.fontFamily = object.fontFamily || "Inter, sans-serif";
-      textarea.spellcheck = true;
-      textarea.addEventListener("input", () => {
-        object.text = textarea.value;
-        autoGrow(textarea, object);
+      const editor = document.createElement("div");
+      editor.className = "note-edit";
+      editor.contentEditable = "true";
+      editor.setAttribute("role", "textbox");
+      editor.setAttribute("aria-multiline", "true");
+      editor.setAttribute("data-placeholder", "Write your explanation, working steps or answer…");
+      editor.spellcheck = true;
+      editor.style.fontSize = `${object.fontSize || 19}px`;
+      editor.style.fontFamily = object.fontFamily || "Inter, sans-serif";
+      if (object.html) {
+        editor.innerHTML = object.html;
+        editor.querySelectorAll("math-field.inline-math-field").forEach(inlineField => {
+          inlineField.value = inlineField.dataset.latex || "";
+        });
+      } else editor.textContent = object.text || "";
+      editor.addEventListener("input", () => {
+        object.html = editor.innerHTML;
+        object.text = editor.innerText;
+        autoGrow(editor, object);
         scheduleSave();
       });
-      textarea.addEventListener("focus", () => selectObject(object.id));
-      textarea.addEventListener("keydown", event => {
+      editor.addEventListener("focus", () => selectObject(object.id));
+      editor.addEventListener("keydown", event => {
         if (event.key !== "Enter" || event.shiftKey) return;
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        const before = textarea.value.slice(0, start);
-        const currentLine = before.split("\n").pop();
-        const match = currentLine.match(/^(\s*)([-*•]|\d+[.)])\s+(.*)$/);
-        if (match) {
-          event.preventDefault();
-          // Pressing Enter on an empty list item exits the list.
-          if (!match[3].trim()) {
-            const lineStart = before.lastIndexOf("\n") + 1;
-            textarea.setRangeText("\n", lineStart, end, "end");
-          } else {
-            const marker = /^\d/.test(match[2])
-              ? `${Number.parseInt(match[2], 10) + 1}. `
-              : `${match[2]} `;
-            textarea.setRangeText(`\n${match[1]}${marker}`, start, end, "end");
-          }
-          object.text = textarea.value;
-          autoGrow(textarea, object);
-          scheduleSave();
-        }
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return;
+        const range = selection.getRangeAt(0);
+        const node = range.startContainer;
+        if (node.nodeType !== Node.TEXT_NODE) return;
+        const before = node.textContent.slice(0, range.startOffset);
+        const match = before.match(/(^|\n)(\s*)([-*•]|\d+[.)])\s+([^\n]*)$/);
+        if (!match) return;
+        event.preventDefault();
+        const isEmpty = !match[4].trim();
+        const marker = /^\d/.test(match[3])
+          ? `${Number.parseInt(match[3], 10) + 1}. `
+          : `${match[3]} `;
+        document.execCommand("insertText", false, isEmpty ? "\n" : `\n${match[2]}${marker}`);
+        object.html = editor.innerHTML;
+        object.text = editor.innerText;
+        autoGrow(editor, object);
+        scheduleSave();
       });
-      element.append(textarea);
-      requestAnimationFrame(() => autoGrow(textarea, object));
+      element.append(editor);
+      requestAnimationFrame(() => autoGrow(editor, object));
     } else if (object.kind === "shape") {
       const holder = document.createElement("div");
       holder.className = "shape-holder";
@@ -439,7 +445,7 @@ $("#objectFontSize").addEventListener("input", event => {
   const object = objects.find(item => item.id === selectedId);
   if (!object) return;
   object.fontSize = Number(event.target.value);
-  const editor = layer.querySelector(`[data-id="${CSS.escape(object.id)}"] math-field, [data-id="${CSS.escape(object.id)}"] textarea`);
+  const editor = layer.querySelector(`[data-id="${CSS.escape(object.id)}"] math-field, [data-id="${CSS.escape(object.id)}"] .note-edit`);
   if (editor) editor.style.fontSize = `${object.fontSize}px`;
   $("#objectSizeValue").textContent = `${object.fontSize}px`;
   scheduleSave();
@@ -455,10 +461,62 @@ $("#fontFamily").addEventListener("change", event => {
     return;
   }
   object.fontFamily = event.target.value;
-  const editor = layer.querySelector(`[data-id="${CSS.escape(object.id)}"] textarea`);
+  const editor = layer.querySelector(`[data-id="${CSS.escape(object.id)}"] .note-edit`);
   if (editor) editor.style.fontFamily = object.fontFamily;
   scheduleSave();
 });
+let lastFocusedNoteId = null;
+layer.addEventListener("focusin", event => {
+  const note = event.target.closest(".note-edit");
+  if (note) lastFocusedNoteId = note.closest(".board-object")?.dataset.id || null;
+});
+function applyNoteCommand(command) {
+  const note = lastFocusedNoteId && layer.querySelector(`[data-id="${CSS.escape(lastFocusedNoteId)}"] .note-edit`);
+  if (!note) { toast("Select and click inside a text box first."); return; }
+  note.focus();
+  document.execCommand(command, false);
+  const object = objects.find(item => item.id === lastFocusedNoteId);
+  if (object) { object.html = note.innerHTML; object.text = note.innerText; scheduleSave(); }
+}
+["noteBold","noteItalic","noteUnderline","insertInlineMath"].forEach(id => {
+  $(`#${id}`).addEventListener("mousedown", event => event.preventDefault());
+});
+$("#noteBold").addEventListener("click", () => applyNoteCommand("bold"));
+$("#noteItalic").addEventListener("click", () => applyNoteCommand("italic"));
+$("#noteUnderline").addEventListener("click", () => applyNoteCommand("underline"));
+$("#insertInlineMath").addEventListener("click", () => {
+  const note = lastFocusedNoteId && layer.querySelector(`[data-id="${CSS.escape(lastFocusedNoteId)}"] .note-edit`);
+  if (!note) { toast("Select and click inside a text box first."); return; }
+  note.focus();
+  const field = document.createElement("math-field");
+  field.className = "inline-math-field";
+  field.setAttribute("virtual-keyboard-mode", "manual");
+  field.setAttribute("smart-mode", "true");
+  field.value = "";
+  field.dataset.latex = "";
+  const selection = window.getSelection();
+  if (selection && selection.rangeCount && note.contains(selection.anchorNode)) {
+    const range = selection.getRangeAt(0);
+    range.deleteContents();
+    range.insertNode(field);
+    range.setStartAfter(field);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  } else note.append(field);
+  const object = objects.find(item => item.id === lastFocusedNoteId);
+  const saveInline = () => {
+    if (!object) return;
+    field.dataset.latex = field.value || "";
+    object.html = note.innerHTML;
+    object.text = note.innerText;
+    scheduleSave();
+  };
+  field.addEventListener("input", saveInline);
+  field.addEventListener("blur", saveInline);
+  requestAnimationFrame(() => field.focus());
+});
+
 function setZoom(value) {
   zoom = clamp(value, 0.5, 1.5);
   paper.style.zoom = String(zoom);
@@ -480,6 +538,13 @@ const shapeSvg = {
  circle:'<svg viewBox="0 0 160 140"><circle cx="80" cy="70" r="58"/></svg>',
  semicircle:'<svg viewBox="0 0 180 120"><path d="M10 105 A80 80 0 0 1 170 105 Z"/></svg>',
  sector:'<svg viewBox="0 0 180 150"><path d="M90 75 L170 75 A80 80 0 0 0 50 10 Z"/></svg>',
+ sector30:'<svg viewBox="0 0 180 155"><path d="M90,78 L90.00,16.00 A62,62 0 0 1 121.00,24.31 Z"/><text x="98.8" y="45.2" text-anchor="middle">30°</text></svg>',
+ sector45:'<svg viewBox="0 0 180 155"><path d="M90,78 L90.00,16.00 A62,62 0 0 1 133.84,34.16 Z"/><text x="103.0" y="46.6" text-anchor="middle">45°</text></svg>',
+ sector60:'<svg viewBox="0 0 180 155"><path d="M90,78 L90.00,16.00 A62,62 0 0 1 143.69,47.00 Z"/><text x="107.0" y="48.6" text-anchor="middle">60°</text></svg>',
+ sector90:'<svg viewBox="0 0 180 155"><path d="M90,78 L90.00,16.00 A62,62 0 0 1 152.00,78.00 Z"/><text x="114.0" y="54.0" text-anchor="middle">90°</text></svg>',
+ sector120:'<svg viewBox="0 0 180 155"><path d="M90,78 L90.00,16.00 A62,62 0 0 1 143.69,109.00 Z"/><text x="119.4" y="61.0" text-anchor="middle">120°</text></svg>',
+ sector150:'<svg viewBox="0 0 180 155"><path d="M90,78 L90.00,16.00 A62,62 0 0 1 121.00,131.69 Z"/><text x="122.8" y="69.2" text-anchor="middle">150°</text></svg>',
+ sector270:'<svg viewBox="0 0 180 155"><path d="M90,78 L90.00,16.00 A62,62 0 1 1 28.00,78.00 Z"/><text x="114.0" y="102.0" text-anchor="middle">270°</text></svg>',
  arc:'<svg viewBox="0 0 180 140"><path d="M15 120 A80 80 0 0 1 165 120"/></svg>',
  oval:'<svg viewBox="0 0 180 130"><ellipse cx="90" cy="65" rx="78" ry="48"/></svg>',
  rhombus:'<svg viewBox="0 0 180 140"><polygon points="90,8 168,70 90,132 12,70"/></svg>',
@@ -749,15 +814,85 @@ $("#newBoardBtn").addEventListener("click", () => {
   updateHistoryButtons();
   scheduleSave();
 });
-$("#downloadBtn").addEventListener("click", () => {
-  renderObjects();
-  redrawInk();
-  window.print();
-});
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+}
+function exportBoardPDF() {
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) { toast("Please allow pop-ups to export the PDF."); return; }
+  const paperClass = ["grid","dots","lines","plain"].includes($("#paperStyle").value) ? $("#paperStyle").value : "grid";
+  const inkImage = canvas.toDataURL("image/png");
+  const rendered = objects.map(object => {
+    const common = `position:absolute;left:${object.x}px;top:${object.y}px;width:${object.w || 520}px;height:${object.h || 100}px;box-sizing:border-box;`;
+    if (object.kind === "eq") {
+      return `<div class="print-equation" style="${common}font-size:${object.fontSize || 34}px"><span>\\(${escapeHtml(object.latex || "")}\\)</span></div>`;
+    }
+    if (object.kind === "note") {
+      let content = object.html || escapeHtml(object.text || "").replace(/\n/g,"<br>");
+      content = content.replace(/<math-field\b[^>]*>([\s\S]*?)<\/math-field>/gi, (_, inner) => `\\(${escapeHtml(inner)}\\)`);
+      const fonts = ["Inter, sans-serif","Arial, sans-serif","'Noto Sans Sinhala', sans-serif","Georgia, serif"];
+      const font = fonts.includes(object.fontFamily) ? object.fontFamily : "Inter, sans-serif";
+      return `<div class="print-note" style="${common}font-size:${object.fontSize || 19}px;font-family:${font}">${content}</div>`;
+    }
+    if (object.kind === "shape") return `<div class="print-shape" style="${common}">${object.svg || ""}</div>`;
+    return "";
+  }).join("");
+  const title = escapeHtml($("#boardTitle").value || "MathsMate Board");
+  const css = `
+    @page{size:A4 landscape;margin:8mm}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:#fff;color:#172d45;font-family:Inter,Arial,sans-serif}
+    .page{width:277mm;height:184.67mm;overflow:hidden;position:relative;page-break-inside:avoid}
+    .paper{position:absolute;left:0;top:0;width:2400px;height:1600px;transform:scale(.435);transform-origin:top left;overflow:hidden;background-color:#fff}
+    .paper.grid{background-image:linear-gradient(#e8f1fa 1px,transparent 1px),linear-gradient(90deg,#e8f1fa 1px,transparent 1px);background-size:26px 26px}
+    .paper.dots{background-image:radial-gradient(#cbdced 1px,transparent 1px);background-size:23px 23px}
+    .paper.lines{background-image:repeating-linear-gradient(transparent,transparent 31px,#e2edf7 32px)}
+    .print-equation{padding:8px 12px;overflow:visible;white-space:normal}
+    .print-equation mjx-container{margin:0!important;max-width:100%;color:#111}
+    .print-note{padding:8px 12px;line-height:1.55;overflow-wrap:anywhere;white-space:normal}
+    .print-shape svg{width:100%;height:100%;overflow:visible}
+    .print-shape polygon,.print-shape rect,.print-shape circle,.print-shape ellipse,.print-shape path{fill:rgba(82,157,220,.08);stroke:#438fce;stroke-width:2.5}
+    .print-shape line,.print-shape polyline{stroke:#438fce;stroke-width:2.5;fill:none}
+    .ink{position:absolute;inset:0;width:2400px;height:1600px;object-fit:fill}
+    .heading{font-size:10px;color:#6c839c;margin:0 0 3mm;font-weight:600}
+    @media print{.page{break-after:avoid}.paper{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+  `;
+  printWindow.document.open();
+  printWindow.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${title}</title>
+    <style>${css}</style>
+    <script>window.MathJax={tex:{inlineMath:[['\\\\(','\\\\)']],displayMath:[['\\\\[','\\\\]']]},svg:{fontCache:'global'},startup:{typeset:false}};</script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  </head><body>
+    <div class="heading">${title}</div>
+    <div class="page"><div class="paper ${paperClass}">${rendered}<img class="ink" src="${inkImage}" alt=""></div></div>
+    <script>
+      (async function(){
+        try {
+          const deadline = Date.now() + 12000;
+          while (!(window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) && Date.now() < deadline) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+          if (window.MathJax && window.MathJax.startup && window.MathJax.startup.promise) {
+            await window.MathJax.startup.promise;
+            await window.MathJax.typesetPromise();
+          }
+        } catch(e) {}
+        try {
+          const ink = document.querySelector(".ink");
+          if (ink && !ink.complete) await new Promise(resolve => { ink.onload=resolve; ink.onerror=resolve; });
+        } catch(e) {}
+        await new Promise(resolve => setTimeout(resolve, 250));
+        window.focus(); window.print();
+      })();
+    <\/script>
+  </body></html>`);
+  printWindow.document.close();
+}
+$("#downloadBtn").addEventListener("click", exportBoardPDF);
 
 document.addEventListener("keydown", event => {
   const target = event.target;
-  const editing = target && (target.matches("input,textarea,math-field,select") || target.isContentEditable);
+  const editing = target && (target.matches("input,textarea,math-field,select,.note-edit") || target.isContentEditable);
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z" && !editing) {
     event.preventDefault();
     undo();

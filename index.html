@@ -4,912 +4,366 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#eaf4ff">
-
   <title>MathsMate | Smart Mathematics Whiteboard</title>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
-
-  <!-- MathLive Equation Editor -->
   <script src="https://unpkg.com/mathlive"></script>
-
-  <!-- Main CSS -->
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-
 <div class="app-shell">
 
-  <!-- ================= TOP BAR ================= -->
-
+  <!-- TOP BAR -->
   <header class="topbar">
-
     <a class="brand" href="#" aria-label="MathsMate home">
-
       <span class="brand-mark">M</span>
-
       <span>
         <strong>MathsMate</strong>
         <small>SMART MATHEMATICS WHITEBOARD</small>
       </span>
-
     </a>
 
     <div class="board-name">
-
       <label for="boardTitle">BOARD NAME</label>
-
-      <input
-        id="boardTitle"
-        type="text"
-        value="My Maths Board"
-        maxlength="80"
-        placeholder="Name your board"
-      >
-
+      <input id="boardTitle" value="My Maths Board" maxlength="80" placeholder="Name your board">
     </div>
 
     <div class="top-actions">
-
-      <span id="saveStatus" class="save-status">
-        Ready
-      </span>
-
-      <button id="newBoardBtn" class="btn btn-light">
-        ＋ New
-      </button>
-
-      <button id="openBoardBtn" class="btn btn-light">
-        ▤ Open
-      </button>
-
-      <button id="saveBtn" class="btn btn-primary">
-        Save board
-      </button>
-
-      <button id="downloadBtn" class="btn btn-outline">
-        ↓ Export PDF
-      </button>
-
+      <span id="saveStatus" class="save-status">Ready</span>
+      <button id="newBoardBtn" class="btn btn-light">＋ New</button>
+      <button id="openBoardBtn" class="btn btn-light">▤ Open</button>
+      <button id="saveBtn" class="btn btn-primary">Save board</button>
+      <button id="downloadBtn" class="btn btn-outline">↓ Export PDF</button>
     </div>
-
   </header>
 
-
-  <!-- ================= MAIN CONTENT ================= -->
-
+  <!-- MAIN CONTENT -->
   <main class="app-main">
 
-
-    <!-- ================= SIDEBAR ================= -->
-
+    <!-- SIDEBAR -->
     <aside class="sidebar">
 
       <div class="side-intro">
-
-        <span class="eyebrow">
-          YOUR DIGITAL MATHS SPACE
-        </span>
-
+        <span class="eyebrow">YOUR DIGITAL MATHS SPACE</span>
         <h1>Whiteboard tools</h1>
-
-        <p>
-          Create clear solutions, notes and diagrams
-          in one place.
-        </p>
-
+        <p>Create clear solutions, notes and diagrams in one place.</p>
       </div>
 
-
       <!-- QUICK INSERT -->
-
       <section class="panel-section">
-
         <h2>Quick insert</h2>
 
         <div class="quick-grid">
-
           <button id="addEquation" class="quick-card">
-
             <span class="quick-icon math-icon">∑</span>
-
             <b>Equation</b>
-
             <small>Write mathematics</small>
-
           </button>
-
 
           <button id="addNote" class="quick-card">
-
             <span class="quick-icon text-icon">T</span>
-
             <b>Text box</b>
-
             <small>Notes and bullets</small>
-
           </button>
-
 
           <button id="addShape" class="quick-card">
-
             <span class="quick-icon shape-icon">△</span>
-
             <b>Shapes</b>
-
             <small>Geometry library</small>
-
           </button>
-
 
           <button id="helpBtn" class="quick-card">
-
             <span class="quick-icon help-icon">?</span>
-
             <b>How to use</b>
-
             <small>Short guide</small>
-
           </button>
-
         </div>
-
       </section>
-
 
       <!-- DRAWING TOOLS -->
-
       <section class="panel-section">
-
         <div class="section-title-row">
-
           <h2>Draw on board</h2>
-
-          <span class="tiny-label">
-            FREEHAND
-          </span>
-
+          <span class="tiny-label">FREEHAND</span>
         </div>
-
 
         <div class="drawing-tools">
-
-          <button
-            id="selectMode"
-            class="tool-button selected"
-            title="Select / move"
-          >
-            ↖
-          </button>
-
-          <button
-            id="penMode"
-            class="tool-button"
-            title="Pen"
-          >
-            ✎
-          </button>
-
-          <button
-            id="eraserMode"
-            class="tool-button"
-            title="Eraser"
-          >
-            ⌫
-          </button>
-
-          <button
-            id="clearInkBtn"
-            class="tool-button"
-            title="Clear ink"
-          >
-            Clear
-          </button>
-
+          <button id="selectMode" class="tool-button selected" title="Select / move">↖</button>
+          <button id="penMode" class="tool-button" title="Pen">✎</button>
+          <button id="eraserMode" class="tool-button" title="Eraser">⌫</button>
+          <button id="clearInkBtn" class="tool-button" title="Clear ink">Clear</button>
         </div>
-
 
         <div class="control-row">
-
-          <label for="brushSize">
-            Pen thickness
-          </label>
-
-          <output id="brushSizeValue">
-            4 px
-          </output>
-
+          <label for="brushSize">Pen thickness</label>
+          <output id="brushSizeValue">4 px</output>
         </div>
 
+        <input id="brushSize" class="range" type="range" min="1" max="24" value="4">
 
-        <input
-          id="brushSize"
-          class="range"
-          type="range"
-          min="1"
-          max="24"
-          value="4"
-        >
-
-
-        <label class="color-label" for="penColor">
-          Pen colour
-        </label>
-
-        <input
-          id="penColor"
-          class="color-input"
-          type="color"
-          value="#2878d0"
-        >
-
+        <label class="color-label" for="penColor">Pen colour</label>
+        <input id="penColor" class="color-input" type="color" value="#2878d0">
       </section>
 
-
       <!-- MATHS SYMBOL LIBRARY -->
-
       <section class="panel-section symbols-section">
-
         <div class="section-title-row">
-
           <h2>Maths symbols</h2>
-
-          <span class="tiny-label">
-            LIBRARY
-          </span>
-
+          <span class="tiny-label">LIBRARY</span>
         </div>
-
 
         <div class="category-tabs" id="categoryTabs">
-
-          <button
-            class="cat-tab active"
-            data-category="all"
-          >
-            All
-          </button>
-
-          <button
-            class="cat-tab"
-            data-category="basic"
-          >
-            Basic
-          </button>
-
-          <button
-            class="cat-tab"
-            data-category="algebra"
-          >
-            Algebra
-          </button>
-
-          <button
-            class="cat-tab"
-            data-category="fractions"
-          >
-            Fractions
-          </button>
-
-          <button
-            class="cat-tab"
-            data-category="geometry"
-          >
-            Geometry
-          </button>
-
-          <button
-            class="cat-tab"
-            data-category="functions"
-          >
-            Functions
-          </button>
-
-          <button
-            class="cat-tab"
-            data-category="mensuration"
-          >
-            Mensuration
-          </button>
-
+          <button class="cat-tab active" data-category="all">All</button>
+          <button class="cat-tab" data-category="basic">Basic</button>
+          <button class="cat-tab" data-category="algebra">Algebra</button>
+          <button class="cat-tab" data-category="fractions">Fractions</button>
+          <button class="cat-tab" data-category="geometry">Geometry</button>
+          <button class="cat-tab" data-category="functions">Functions</button>
+          <button class="cat-tab" data-category="mensuration">Mensuration</button>
         </div>
 
-
-        <input
-          id="symbolSearch"
-          class="search-input"
-          type="search"
-          placeholder="Search symbols…"
-        >
-
-
+        <input id="symbolSearch" class="search-input" type="search" placeholder="Search symbols…">
         <div id="symbolGroups"></div>
-
       </section>
 
     </aside>
 
-
-    <!-- ================= WHITEBOARD WORKSPACE ================= -->
-
+    <!-- WHITEBOARD WORKSPACE -->
     <section class="workspace">
 
-
-      <!-- WORKSPACE TOOLBAR -->
-
+      <!-- TOOLBAR -->
       <div class="workspace-toolbar">
 
         <div class="toolbar-left">
-
-          <button
-            id="undoBtn"
-            class="toolbar-icon"
-            title="Undo"
-          >
-            ↶
-          </button>
-
-          <button
-            id="redoBtn"
-            class="toolbar-icon"
-            title="Redo"
-          >
-            ↷
-          </button>
+          <button id="undoBtn" class="toolbar-icon" title="Undo">↶</button>
+          <button id="redoBtn" class="toolbar-icon" title="Redo">↷</button>
 
           <span class="toolbar-divider"></span>
 
-          <label for="paperStyle">
-            Paper
-          </label>
+          <label for="paperStyle">Paper</label>
 
           <select id="paperStyle" class="select-control">
-
-            <option value="grid">
-              Grid
-            </option>
-
-            <option value="dots">
-              Dots
-            </option>
-
-            <option value="lines">
-              Ruled
-            </option>
-
-            <option value="plain">
-              Plain
-            </option>
-
+            <option value="grid">Grid</option>
+            <option value="dots">Dots</option>
+            <option value="lines">Ruled</option>
+            <option value="plain">Plain</option>
           </select>
-
         </div>
 
-
         <div class="toolbar-right">
+          <label for="objectFontSize">Text size</label>
 
-          <label for="objectFontSize">
-            Text size
-          </label>
+          <input id="objectFontSize" type="range" min="12" max="80" value="34">
 
-          <input
-            id="objectFontSize"
-            type="range"
-            min="12"
-            max="80"
-            value="34"
-          >
+          <output id="objectSizeValue">34px</output>
 
-          <output id="objectSizeValue">
-            34px
-          </output>
+          <label class="font-label" for="fontFamily">Font</label>
 
-
-          <label class="font-label" for="fontFamily">
-            Font
-          </label>
-
-          <select
-            id="fontFamily"
-            class="select-control"
-            aria-label="Text font"
-          >
-
-            <option value="Inter, sans-serif">
-              Inter
-            </option>
-
-            <option value="Arial, sans-serif">
-              Arial
-            </option>
-
-            <option value="'Noto Sans Sinhala', sans-serif">
-              Noto Sans Sinhala
-            </option>
-
-            <option value="Georgia, serif">
-              Georgia
-            </option>
-
+          <select id="fontFamily" class="select-control" aria-label="Text font">
+            <option value="Inter, sans-serif">Inter</option>
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="'Noto Sans Sinhala', sans-serif">Noto Sans Sinhala</option>
+            <option value="Georgia, serif">Georgia</option>
           </select>
-
 
           <span class="toolbar-divider"></span>
 
-
-          <button
-            id="zoomOut"
-            class="toolbar-icon"
-            title="Zoom out"
-          >
-            −
+          <button id="noteBold" class="toolbar-icon format-button" type="button" title="Bold" aria-label="Bold">
+            <strong>B</strong>
           </button>
 
-          <strong id="zoomLabel" class="zoom-label">
-            100%
-          </strong>
-
-          <button
-            id="zoomIn"
-            class="toolbar-icon"
-            title="Zoom in"
-          >
-            ＋
+          <button id="noteItalic" class="toolbar-icon format-button" type="button" title="Italic" aria-label="Italic">
+            <em>I</em>
           </button>
 
+          <button id="noteUnderline" class="toolbar-icon format-button" type="button" title="Underline" aria-label="Underline">
+            <u>U</u>
+          </button>
+
+          <button id="insertInlineMath" class="toolbar-icon format-button" type="button" title="Insert equation in text" aria-label="Insert inline equation">
+            ∑
+          </button>
+
+          <span class="toolbar-divider"></span>
+
+          <button id="zoomOut" class="toolbar-icon" title="Zoom out">−</button>
+          <strong id="zoomLabel" class="zoom-label">100%</strong>
+          <button id="zoomIn" class="toolbar-icon" title="Zoom in">＋</button>
         </div>
-
       </div>
-
 
       <!-- WORKSPACE HINT -->
-
       <div class="workspace-hint">
-
         <span class="hint-dot"></span>
-
-        Click the board to add an equation
-        · Use the dotted handle to move
-        · Drag the bottom-right corner to resize
-
+        Click the board to add an equation · Use the dotted handle to move · Drag the bottom-right corner to resize
       </div>
 
-
-      <!-- PAPER VIEWPORT -->
-
-      <div
-        class="paper-viewport"
-        id="paperContainer"
-      >
-
+      <!-- PAPER -->
+      <div class="paper-viewport" id="paperContainer">
         <div id="paper" class="paper grid">
 
-
-          <!-- EMPTY BOARD PLACEHOLDER -->
-
-          <div
-            id="placeholder"
-            class="paper-placeholder"
-          >
-
-            <div class="placeholder-mark">
-              ∑
-            </div>
-
+          <div id="placeholder" class="paper-placeholder">
+            <div class="placeholder-mark">∑</div>
             <h2>Your maths workspace</h2>
-
-            <p>
-              Click anywhere to start an equation,
-              or add a text box for your working steps.
-            </p>
-
-            <span>
-              TIP · Press Enter in an equation to create the next line
-            </span>
-
+            <p>Click anywhere to start an equation, or add a text box for your working steps.</p>
+            <span>TIP · Press Enter in an equation to create the next line</span>
           </div>
-
-
-          <!-- EQUATIONS, TEXT BOXES AND SHAPES -->
 
           <div id="equationLayer"></div>
 
-
-          <!-- FREEHAND DRAWING CANVAS -->
-
-          <canvas
-            id="inkCanvas"
-            aria-label="Freehand drawing area"
-          ></canvas>
+          <canvas id="inkCanvas" aria-label="Freehand drawing area"></canvas>
 
         </div>
-
       </div>
 
     </section>
-
   </main>
-
 </div>
 
+<!-- TOAST -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-<!-- ================= TOAST NOTIFICATION ================= -->
-
-<div
-  id="toast"
-  class="toast"
-  role="status"
-  aria-live="polite"
-></div>
-
-
-<!-- ================= SHAPE LIBRARY DIALOG ================= -->
-
-<dialog
-  id="shapeDialog"
-  class="app-dialog shape-dialog"
->
+<!-- SHAPE LIBRARY -->
+<dialog id="shapeDialog" class="app-dialog shape-dialog">
 
   <div class="dialog-heading">
-
     <div>
-
-      <span class="eyebrow">
-        DIAGRAM BUILDER
-      </span>
-
+      <span class="eyebrow">DIAGRAM BUILDER</span>
       <h2>Shapes & geometric solids</h2>
-
     </div>
 
-    <button
-      id="closeShape"
-      class="close-button"
-      aria-label="Close"
-    >
-      ×
-    </button>
-
+    <button id="closeShape" class="close-button" aria-label="Close">×</button>
   </div>
 
-
   <p class="dialog-description">
-
-    Select a 2D shape, 3D solid or geometry element
-    to add it to the board. You can move and resize
-    every shape.
-
+    Select a 2D shape, 3D solid or geometry element to add it to the board. You can move and resize every shape.
   </p>
 
-
   <!-- 2D SHAPES -->
-
   <div class="shape-category">
-
     <h3>2D shapes</h3>
 
     <div class="shape-options">
+      <button class="shape-option" data-shape="triangle"><span>△</span>Triangle</button>
+      <button class="shape-option" data-shape="rightTriangle"><span>◿</span>Right triangle</button>
+      <button class="shape-option" data-shape="square"><span>□</span>Square</button>
+      <button class="shape-option" data-shape="rectangle"><span>▭</span>Rectangle</button>
+      <button class="shape-option" data-shape="circle"><span>○</span>Circle</button>
+      <button class="shape-option" data-shape="semicircle"><span>◠</span>Semicircle</button>
+      <button class="shape-option" data-shape="sector"><span>◔</span>Sector</button>
 
-      <button class="shape-option" data-shape="triangle">
-        <span>△</span>
-        Triangle
-      </button>
+      <button class="shape-option" data-shape="sector30"><span>◔</span>30° sector</button>
+      <button class="shape-option" data-shape="sector45"><span>◔</span>45° sector</button>
+      <button class="shape-option" data-shape="sector60"><span>◔</span>60° sector</button>
+      <button class="shape-option" data-shape="sector90"><span>◔</span>90° sector</button>
+      <button class="shape-option" data-shape="sector120"><span>◔</span>120° sector</button>
+      <button class="shape-option" data-shape="sector150"><span>◔</span>150° sector</button>
+      <button class="shape-option" data-shape="sector270"><span>◔</span>270° sector</button>
 
-      <button class="shape-option" data-shape="rightTriangle">
-        <span>◿</span>
-        Right triangle
-      </button>
-
-      <button class="shape-option" data-shape="square">
-        <span>□</span>
-        Square
-      </button>
-
-      <button class="shape-option" data-shape="rectangle">
-        <span>▭</span>
-        Rectangle
-      </button>
-
-      <button class="shape-option" data-shape="circle">
-        <span>○</span>
-        Circle
-      </button>
-
-      <button class="shape-option" data-shape="semicircle">
-        <span>◠</span>
-        Semicircle
-      </button>
-
-      <button class="shape-option" data-shape="sector">
-        <span>◔</span>
-        Sector
-      </button>
-
-      <button class="shape-option" data-shape="arc">
-        <span>⌒</span>
-        Arc
-      </button>
-
-      <button class="shape-option" data-shape="oval">
-        <span>⬭</span>
-        Oval
-      </button>
-
-      <button class="shape-option" data-shape="rhombus">
-        <span>◇</span>
-        Rhombus
-      </button>
-
-      <button class="shape-option" data-shape="parallelogram">
-        <span>▱</span>
-        Parallelogram
-      </button>
-
-      <button class="shape-option" data-shape="trapezoid">
-        <span>⏢</span>
-        Trapezoid
-      </button>
-
-      <button class="shape-option" data-shape="pentagon">
-        <span>⬠</span>
-        Pentagon
-      </button>
-
-      <button class="shape-option" data-shape="hexagon">
-        <span>⬡</span>
-        Hexagon
-      </button>
-
-      <button class="shape-option" data-shape="octagon">
-        <span>⯄</span>
-        Octagon
-      </button>
-
-      <button class="shape-option" data-shape="line">
-        <span>／</span>
-        Line
-      </button>
-
+      <button class="shape-option" data-shape="arc"><span>⌒</span>Arc</button>
+      <button class="shape-option" data-shape="oval"><span>⬭</span>Oval</button>
+      <button class="shape-option" data-shape="rhombus"><span>◇</span>Rhombus</button>
+      <button class="shape-option" data-shape="parallelogram"><span>▱</span>Parallelogram</button>
+      <button class="shape-option" data-shape="trapezoid"><span>⏢</span>Trapezoid</button>
+      <button class="shape-option" data-shape="pentagon"><span>⬠</span>Pentagon</button>
+      <button class="shape-option" data-shape="hexagon"><span>⬡</span>Hexagon</button>
+      <button class="shape-option" data-shape="octagon"><span>⯄</span>Octagon</button>
+      <button class="shape-option" data-shape="line"><span>／</span>Line</button>
     </div>
-
   </div>
 
-
   <!-- 3D SOLIDS -->
-
   <div class="shape-category">
-
     <h3>3D solids</h3>
 
     <div class="shape-options">
-
-      <button class="shape-option" data-shape="cube">
-        <span>▣</span>
-        Cube
-      </button>
-
-      <button class="shape-option" data-shape="cuboid">
-        <span>▰</span>
-        Cuboid
-      </button>
-
-      <button class="shape-option" data-shape="cylinder">
-        <span>▤</span>
-        Cylinder
-      </button>
-
-      <button class="shape-option" data-shape="cone">
-        <span>△</span>
-        Cone
-      </button>
-
-      <button class="shape-option" data-shape="sphere">
-        <span>◉</span>
-        Sphere
-      </button>
-
-      <button class="shape-option" data-shape="hemisphere">
-        <span>◒</span>
-        Hemisphere
-      </button>
-
-      <button class="shape-option" data-shape="squarePyramid">
-        <span>◇</span>
-        Square pyramid
-      </button>
-
-      <button class="shape-option" data-shape="triangularPrism">
-        <span>◭</span>
-        Triangular prism
-      </button>
-
+      <button class="shape-option" data-shape="cube"><span>▣</span>Cube</button>
+      <button class="shape-option" data-shape="cuboid"><span>▰</span>Cuboid</button>
+      <button class="shape-option" data-shape="cylinder"><span>▤</span>Cylinder</button>
+      <button class="shape-option" data-shape="cone"><span>△</span>Cone</button>
+      <button class="shape-option" data-shape="sphere"><span>◉</span>Sphere</button>
+      <button class="shape-option" data-shape="hemisphere"><span>◒</span>Hemisphere</button>
+      <button class="shape-option" data-shape="squarePyramid"><span>◇</span>Square pyramid</button>
+      <button class="shape-option" data-shape="triangularPrism"><span>◭</span>Triangular prism</button>
     </div>
-
   </div>
 
-
   <!-- GEOMETRY ELEMENTS -->
-
   <div class="shape-category">
-
     <h3>Geometry elements</h3>
 
     <div class="shape-options">
-
-      <button class="shape-option" data-shape="angle">
-        <span>∠</span>
-        Angle
-      </button>
-
-      <button class="shape-option" data-shape="parallel">
-        <span>∥</span>
-        Parallel lines
-      </button>
-
-      <button class="shape-option" data-shape="perpendicular">
-        <span>⊥</span>
-        Perpendicular
-      </button>
-
-      <button class="shape-option" data-shape="coordinateAxes">
-        <span>⌖</span>
-        Axes
-      </button>
-
-      <button class="shape-option" data-shape="numberLine">
-        <span>↔</span>
-        Number line
-      </button>
-
-      <button class="shape-option" data-shape="arrow">
-        <span>→</span>
-        Arrow
-      </button>
-
+      <button class="shape-option" data-shape="angle"><span>∠</span>Angle</button>
+      <button class="shape-option" data-shape="parallel"><span>∥</span>Parallel lines</button>
+      <button class="shape-option" data-shape="perpendicular"><span>⊥</span>Perpendicular</button>
+      <button class="shape-option" data-shape="coordinateAxes"><span>⌖</span>Axes</button>
+      <button class="shape-option" data-shape="numberLine"><span>↔</span>Number line</button>
+      <button class="shape-option" data-shape="arrow"><span>→</span>Arrow</button>
     </div>
-
   </div>
 
 </dialog>
 
-
-<!-- ================= SAVED BOARDS DIALOG ================= -->
-
-<dialog
-  id="boardsDialog"
-  class="app-dialog"
->
+<!-- SAVED BOARDS -->
+<dialog id="boardsDialog" class="app-dialog">
 
   <div class="dialog-heading">
-
     <div>
-
-      <span class="eyebrow">
-        YOUR WORK
-      </span>
-
+      <span class="eyebrow">YOUR WORK</span>
       <h2>Saved boards</h2>
-
     </div>
 
-    <button
-      id="closeBoards"
-      class="close-button"
-      aria-label="Close"
-    >
-      ×
-    </button>
-
+    <button id="closeBoards" class="close-button" aria-label="Close">×</button>
   </div>
 
-
-  <p class="dialog-description">
-    Saved boards are stored in this browser.
-  </p>
-
+  <p class="dialog-description">Saved boards are stored in this browser.</p>
 
   <div id="savedBoardsList"></div>
 
 </dialog>
 
-
-<!-- ================= HELP DIALOG ================= -->
-
-<dialog
-  id="helpDialog"
-  class="app-dialog help-dialog"
->
+<!-- HELP DIALOG -->
+<dialog id="helpDialog" class="app-dialog help-dialog">
 
   <div class="dialog-heading">
-
     <div>
-
-      <span class="eyebrow">
-        QUICK GUIDE
-      </span>
-
+      <span class="eyebrow">QUICK GUIDE</span>
       <h2>Using MathsMate</h2>
-
     </div>
 
-    <button
-      id="closeHelp"
-      class="close-button"
-      aria-label="Close"
-    >
-      ×
-    </button>
-
+    <button id="closeHelp" class="close-button" aria-label="Close">×</button>
   </div>
-
 
   <div class="help-content">
 
-
     <h3>Equations</h3>
-
-    <p>
-      Add an equation and type mathematics.
-      Press Enter to create the next equation line.
-    </p>
-
+    <p>Add an equation and type mathematics. Press Enter to create the next equation line.</p>
 
     <h3>Text boxes</h3>
-
-    <p>
-      Add a text box for explanations.
-      Enter creates a new line.
-      Start with <code>- </code> or
-      <code>1. </code> to continue a list automatically.
-    </p>
-
+    <p>Add a text box for explanations. Use the B, I and U buttons for bold, italic and underline. Use ∑ to insert an inline equation inside your text. Enter creates a new line and list markers continue automatically.</p>
 
     <h3>Move and resize</h3>
-
-    <p>
-      Drag the dotted handle to move an item.
-      Drag its bottom-right corner to resize it.
-    </p>
-
+    <p>Drag the dotted handle to move an item. Drag its bottom-right corner to resize it.</p>
 
     <h3>Drawing</h3>
-
-    <p>
-      Choose Pen or Eraser, then draw using a mouse,
-      laptop touchpad or touchscreen/stylus.
-    </p>
-
+    <p>Choose Pen or Eraser, then draw using a mouse, laptop touchpad or touchscreen/stylus.</p>
 
     <h3>Save and export</h3>
-
-    <p>
-      Save board stores a named copy in this browser.
-      Export PDF opens the print dialog;
-      choose Save as PDF.
-    </p>
-
+    <p>Save board stores equations, rich text, inline equations, shapes and drawings in this browser. Export PDF creates a print-ready copy with rendered equations; choose Save as PDF.</p>
 
     <p class="note-callout">
-
-      Saved boards are local to this browser
-      and are not synced to another device.
-
+      Saved boards are local to this browser and are not synced to another device.
     </p>
 
   </div>
 
 </dialog>
 
-
-<!-- ================= JAVASCRIPT ================= -->
-
+<!-- JAVASCRIPT -->
 <script src="app.js"></script>
 
 </body>
